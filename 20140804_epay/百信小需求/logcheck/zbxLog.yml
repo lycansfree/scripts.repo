@@ -1,0 +1,24 @@
+# 设置日志的ID，可以为数字，也可以是其他字符
+logIDs:
+    - customName
+
+# 设置基础的zabbix key，和日志ID组合后成为最终发送的key
+basekey: custom.log.check
+
+# 设置日志位置记录文件
+logseek: log.seek
+
+# 根据已设置的日志ID配置相关日志信息
+customName:
+    # 定义zabbix中item和trigger的名称
+    logname: 用户姓名检测
+    # 日志文件的绝对路径
+    logfile: /app/wzf/linshi/test/logcheck/test
+    # checktype类型如下,注意大小写敏感
+    # (name=姓名,IDcard=身份证,mobile=手机号,phone=座机,addr=地址,email=邮箱,birthday=生日,cardNo=卡号,amount=余额,PWD=各种密码,track2=磁条信息,CVV=CVV,expire=有效期,VerifyCode=验证码,photo=照片)
+    checktype: name
+    # key:value模式中key的可能选项
+    logkey: 'person_name|fullname|cust_name|acct_name|acc_name|姓名'
+    
+
+
