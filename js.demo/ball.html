@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <script type="text/javascript" src="./js/jquery-3.1.1.min.js"></script>
+    <style>
+        .ball {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100px;
+            height: 100px;
+            /*
+            background: radial-gradient(circle, #fff, #fff600);
+            border-radius: 50%;
+            */
+        }
+    </style>
+</head>
+
+<body>
+<!-- 仿windows屏保小球 -->
+
+<script>        
+    var mdAttr = document.createDocumentFragment();
+    var ball = document.createElement("img");
+    // ball.setAttribute("style", "width:100px;height:100px;");
+    ball.setAttribute("src", "images/xiaoai.png");
+    ball.setAttribute("class", "ball");
+    // mdAttr.appendChild('<img style="width:100px;height:100px;" src="images/xiaoai.png">');
+    mdAttr.appendChild(ball);
+    //获取浏览器窗口宽高
+    var W = window.innerWidth;
+    var H = window.innerHeight;
+    window.onresize = function() {
+        W = window.innerWidth;
+        H = window.innerHeight;
+    };
+
+    var Vx = 8;
+    var Vy = 12;
+    // var ball = $("img").get(0);
+    ball.startX = 0;
+    ball.startY = 0;
+    document.body.appendChild(mdAttr);
+    ~function sports() {
+        MaxH = H - ball.offsetHeight;
+        MaxW = W - ball.offsetWidth;
+        ball.startX += Vx;
+        ball.startY += Vy;
+        if(ball.startX >= MaxW || ball.startX <=0){//若小球位置超出最大值和最小值就改变方向
+            Vx *= -1;
+            ball.startX = Math.max(0,ball.startX);
+            ball.startX = Math.min(ball.startX,MaxW);
+        }
+        if(ball.startY >= MaxH || ball.startY <=0){
+            Vy *= -1;
+            ball.startY = Math.max(0,ball.startY);
+            ball.startY = Math.min(ball.startY,MaxW);
+        }
+        ball.style.left = ball.startX + "px";//设置小球当前位置
+        ball.style.top = ball.startY + "px";
+
+        window.requestAnimationFrame(sports);
+    }();
+    
+</script>
+</body>
+</html>
