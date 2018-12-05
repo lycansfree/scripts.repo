@@ -11,7 +11,7 @@ The tribe node is deprecated in favour of Cross Cluster Search and will be remov
 ```
 #### Master节点(专用)
 ```
-# 为防止脑裂，
+# 为防止脑裂，需要配置discovery.zen.minimum_master_nodes
 node.master: true
 node.data: false
 node.ingest: false
