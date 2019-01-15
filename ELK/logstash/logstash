@@ -1,0 +1,138 @@
+#!/bin/bash
+# chkconfig:   2345 90 10
+# description:  logstashs
+ 
+basedir="/opt/elk/logstash"
+bindir="${basedir}/bin"
+confdir="${basedir}/conf"
+username="bxapp"
+ 
+print_color() {
+    local content color bakcolor
+    content=$1
+    color=$2
+    bakcolor="\e[0m"
+    case "${color}" in
+        yellow)
+        color_code="\e[0;33;1m"
+        ;;
+        red)
+        color_code="\e[0;31;1m"
+        ;;
+        green)
+        color_code="\e[0;32;1m"
+        ;;
+    esac
+    printf "${color_code}${content}${bakcolor}"
+}
+ 
+ 
+pidApp() {
+    pid=`ps -fu ${username} | grep "${basedir}" | awk '{if($3 == 1) print $2}'`
+}
+ 
+startApp() {
+    printf "开始启动"
+    if [ `id -u` == 0 ];then
+        su - bxapp -c "sh ${bindir}/logstash -f ${confdir} 1>/dev/null 2>&1 &"
+    else
+        sh ${bindir}/logstash -f ${confdir} 1>/dev/null 2>&1 &
+    fi
+ 
+    print_color "..." yellow
+    sleep 1
+ 
+    pidApp
+    kill -0 "${pid}" 2>/dev/null
+    if [ $? == 0 ];then
+        print_color "成功" green
+        printf "\n"
+    else
+        print_color "失败" red
+        printf "\n"
+    fi
+}
+ 
+stopApp() {
+    pidApp
+    kill -0 "${pid}" 2>/dev/null
+    if [ $? == 0 ];then
+        printf "开始停止"
+        kill "${pid}"
+        for i in `seq 10`
+        do
+            kill -0 "${pid}" 2>/dev/null
+            if [ $? != 0 ];then
+                break
+            fi
+            print_color "." yellow
+            sleep 1
+        done
+ 
+        if [ ${i} == 10 ];then
+            kill -9 "${pid}" 2>/dev/null
+            sleep 1
+        fi
+ 
+        # status
+        kill -0 "${pid}" 2>/dev/null
+        if [ $? == 0 ];then
+            print_color "...失败" red
+            printf "\n"
+            exit 2
+        else
+            print_color "...成功" green
+            printf "\n"
+        fi
+    else
+        print_color "logstash stopped" yellow
+        printf "\n"
+    fi
+}
+ 
+reloadApp() {
+    pidApp
+    kill -1 "${pid}" 2>/dev/null
+    if [ $? == 0 ];then
+        print_color "reload succ" yellow
+        printf "\n"
+    else
+        print_color "reload failed" red
+        printf "\n"
+    fi
+}
+ 
+statusApp() {
+    pidApp
+    kill -0 "${pid}" 2>/dev/null
+    if [ $? == 0 ];then
+        print_color "logstash is running" green
+        printf "\n"
+    else
+        print_color "logstash stopped" red
+        printf "\n"
+    fi
+}
+ 
+case "$1" in
+    start)
+        startApp
+        ;;
+    stop)
+        stopApp
+        ;;
+    restart)
+        stopApp
+        startApp
+        ;;
+    reload)
+        reloadApp
+        ;;
+    status)
+        statusApp
+        ;;
+    *)
+        echo $"Usage: $0 {start|stop|restart}"
+        exit 1
+        ;;
+esac
